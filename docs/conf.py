@@ -25,16 +25,23 @@ sys.path.append(os.path.abspath('..'))
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
-  'recommonmark',
+  'myst_parser',
   'sphinx.ext.autodoc',
+  'sphinx.ext.autosectionlabel',
   'sphinx.ext.intersphinx',
   'sphinx.ext.napoleon'
 ]
 
 intersphinx_mapping = {
   'python': ('https://docs.python.org/3', None),
-  'requests': ('https://docs.python-requests.org/en/latest/', None)
+  'aiohttp': ('https://docs.aiohttp.org/en/stable/', None),
+  'requests': ('https://docs.python-requests.org/en/stable/', None)
 }
+
+rst_prolog = """
+.. |coroutine| replace:: This function is a coroutine_.
+.. _coroutine: https://docs.python.org/3/library/asyncio-task.html#coroutine
+"""
 
 # Add any paths that contain templates here, relative to this directory.
 #templates_path = ['_templates']

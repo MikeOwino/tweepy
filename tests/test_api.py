@@ -6,7 +6,8 @@ import unittest
 from ast import literal_eval
 
 from .config import tape, TweepyTestCase, username
-from tweepy import API, FileCache, Friendship, MemoryCache
+from tweepy import API, FileCache, MemoryCache
+from tweepy.models import Friendship
 from tweepy.parsers import Parser
 
 test_tweet_id = '266367358078169089'
@@ -53,22 +54,22 @@ class TweepyAPITests(TweepyTestCase):
     def testmentionstimeline(self):
         self.api.mentions_timeline()
 
-    @tape.use_cassette('testretweetsofme.json')
-    def testretweetsofme(self):
-        self.api.retweets_of_me()
+    @tape.use_cassette('testgetretweetsofme.json')
+    def testgetretweetsofme(self):
+        self.api.get_retweets_of_me()
 
     @tape.use_cassette('testretweetandunretweet.json')
     def testretweetandunretweet(self):
         self.api.retweet(test_tweet_id)
         self.api.unretweet(test_tweet_id)
 
-    @tape.use_cassette('testretweets.json')
-    def testretweets(self):
-        self.api.retweets(test_tweet_id)
+    @tape.use_cassette('testgetretweets.json')
+    def testgetretweets(self):
+        self.api.get_retweets(test_tweet_id)
 
-    @tape.use_cassette('testretweeters.json')
-    def testretweeters(self):
-        self.api.retweeters(test_tweet_id)
+    @tape.use_cassette('testgetretweeterids.json')
+    def testgetretweeterids(self):
+        self.api.get_retweeter_ids(test_tweet_id)
 
     @tape.use_cassette('testgetstatus.json')
     def testgetstatus(self):
@@ -96,7 +97,7 @@ class TweepyAPITests(TweepyTestCase):
 
     @tape.use_cassette('testupdatestatuswithmedia.yaml', serializer='yaml')
     def testupdatestatuswithmedia(self):
-        update = self.api.update_with_media(tweet_text, 'examples/banner.png')
+        update = self.api.update_status_with_media(tweet_text, 'examples/banner.png')
         self.assertIn(tweet_text + ' https://t.co', update.text)
 
     @tape.use_cassette('testmediauploadpng.yaml', serializer='yaml')
@@ -130,12 +131,12 @@ class TweepyAPITests(TweepyTestCase):
     def testsearchusers(self):
         self.api.search_users('twitter')
 
-    @tape.use_cassette('testlistdirectmessages.json')
-    def testlistdirectmessages(self):
-        self.api.list_direct_messages()
+    @tape.use_cassette('testgetdirectmessages.json')
+    def testgetdirectmessages(self):
+        self.api.get_direct_messages()
 
-    @tape.use_cassette('testsendanddestroydirectmessage.json')
-    def testsendanddestroydirectmessage(self):
+    @tape.use_cassette('testsendanddeletedirectmessage.json')
+    def testsendanddeletedirectmessage(self):
         me = self.api.verify_credentials()
 
         # send
@@ -145,7 +146,7 @@ class TweepyAPITests(TweepyTestCase):
         self.assertEqual(int(sent_dm.message_create['target']['recipient_id']), me.id)
 
         # destroy
-        self.api.destroy_direct_message(sent_dm.id)
+        self.api.delete_direct_message(sent_dm.id)
 
     @tape.use_cassette('testcreatedestroyfriendship.yaml', serializer='yaml')
     def testcreatedestroyfriendship(self):
@@ -155,27 +156,27 @@ class TweepyAPITests(TweepyTestCase):
         friend = self.api.create_friendship(screen_name='Twitter')
         self.assertEqual(friend.screen_name, 'Twitter')
 
-    @tape.use_cassette('testshowfriendship.json')
-    def testshowfriendship(self):
-        source, target = self.api.show_friendship(target_screen_name='twitter')
+    @tape.use_cassette('testgetfriendship.json')
+    def testgetfriendship(self):
+        source, target = self.api.get_friendship(target_screen_name='twitter')
         self.assertTrue(isinstance(source, Friendship))
         self.assertTrue(isinstance(target, Friendship))
 
-    @tape.use_cassette('testfriendsids.yaml', serializer='yaml')
-    def testfriendsids(self):
-        self.api.friends_ids(screen_name=username)
+    @tape.use_cassette('testgetfriendids.yaml', serializer='yaml')
+    def testgetfriendids(self):
+        self.api.get_friend_ids(screen_name=username)
 
-    @tape.use_cassette('testfollowersids.yaml', serializer='yaml')
-    def testfollowersids(self):
-        self.api.followers_ids(screen_name=username)
+    @tape.use_cassette('testgetfollowerids.yaml', serializer='yaml')
+    def testgetfollowerids(self):
+        self.api.get_follower_ids(screen_name=username)
 
-    @tape.use_cassette('testfriends.yaml', serializer='yaml')
-    def testfriends(self):
-        self.api.friends(screen_name=username)
+    @tape.use_cassette('testgetfriends.yaml', serializer='yaml')
+    def testgetfriends(self):
+        self.api.get_friends(screen_name=username)
 
-    @tape.use_cassette('testfollowers.yaml', serializer='yaml')
-    def testfollowers(self):
-        self.api.followers(screen_name=username)
+    @tape.use_cassette('testgetfollowers.yaml', serializer='yaml')
+    def testgetfollowers(self):
+        self.api.get_followers(screen_name=username)
 
     @tape.use_cassette('testverifycredentials.json')
     def testverifycredentials(self):
@@ -236,9 +237,9 @@ class TweepyAPITests(TweepyTestCase):
             if k == 'email': continue
             self.assertEqual(getattr(updated, k), v)
 
-    @tape.use_cassette('testfavorites.json')
-    def testfavorites(self):
-        self.api.favorites()
+    @tape.use_cassette('testgetfavorites.json')
+    def testgetfavorites(self):
+        self.api.get_favorites()
 
     @tape.use_cassette('testcreatedestroyfavorite.json')
     def testcreatedestroyfavorite(self):
@@ -251,40 +252,40 @@ class TweepyAPITests(TweepyTestCase):
         self.api.destroy_block(screen_name='twitter')
         self.api.create_friendship(screen_name='twitter')  # restore
 
-    @tape.use_cassette('testblocks.json')
-    def testblocks(self):
-        self.api.blocks()
+    @tape.use_cassette('testgetblocks.json')
+    def testgetblocks(self):
+        self.api.get_blocks()
 
-    @tape.use_cassette('testblocksids.json')
-    def testblocksids(self):
-        self.api.blocks_ids()
+    @tape.use_cassette('testgetblockedids.json')
+    def testgetblockedids(self):
+        self.api.get_blocked_ids()
 
-    # TODO: Rewrite test to be less brittle. It fails way too often.
-    # def testcreateupdatedestroylist(self):
-    #     params = {
-    #         'owner_screen_name': username,
-    #         'slug': 'tweeps'
-    #     }
-    #     l = self.api.create_list(name=params['slug'], **params)
-    #     l = self.api.update_list(list_id=l.id, description='updated!')
-    #     self.assertEqual(l.description, 'updated!')
-    #     self.api.destroy_list(list_id=l.id)
+    @tape.use_cassette('testcreateupdatedestroylist.yaml', serializer='yaml')
+    def testcreateupdatedestroylist(self):
+        params = {
+            'owner_screen_name': username,
+            'slug': 'tweeps'
+        }
+        l = self.api.create_list(name=params['slug'], **params)
+        l = self.api.update_list(list_id=l.id, description='updated!')
+        self.assertEqual(l.description, 'updated!')
+        self.api.destroy_list(list_id=l.id)
 
-    @tape.use_cassette('testlistsall.json')
-    def testlistsall(self):
-        self.api.lists_all()
+    @tape.use_cassette('testgetlists.json')
+    def testgetlists(self):
+        self.api.get_lists()
 
-    @tape.use_cassette('testlistsmemberships.json')
-    def testlistsmemberships(self):
-        self.api.lists_memberships()
+    @tape.use_cassette('testgetlistmemberships.json')
+    def testgetlistmemberships(self):
+        self.api.get_list_memberships()
 
-    @tape.use_cassette('testlistsownerships.json')
-    def testlistsownerships(self):
-        self.api.lists_ownerships()
+    @tape.use_cassette('testgetlistownerships.json')
+    def testgetlistownerships(self):
+        self.api.get_list_ownerships()
 
-    @tape.use_cassette('testlistssubscriptions.json')
-    def testlistssubscriptions(self):
-        self.api.lists_subscriptions()
+    @tape.use_cassette('testgetlistsubscriptions.json')
+    def testgetlistsubscriptions(self):
+        self.api.get_list_subscriptions()
 
     @tape.use_cassette('testlisttimeline.json')
     def testlisttimeline(self):
@@ -322,13 +323,13 @@ class TweepyAPITests(TweepyTestCase):
         assert_list(self.api.add_list_members(**params))
         assert_list(self.api.remove_list_members(**params))
 
-    @tape.use_cassette('testlistmembers.json')
-    def testlistmembers(self):
-        self.api.list_members(owner_screen_name='Twitter', slug='Official-Twitter-Accounts')
+    @tape.use_cassette('testgetlistmembers.json')
+    def testgetlistmembers(self):
+        self.api.get_list_members(owner_screen_name='Twitter', slug='Official-Twitter-Accounts')
 
-    @tape.use_cassette('testshowlistmember.json')
-    def testshowlistmember(self):
-        self.assertTrue(self.api.show_list_member(owner_screen_name='Twitter', slug='Official-Twitter-Accounts', screen_name='TwitterAPI'))
+    @tape.use_cassette('testgetlistmember.json')
+    def testgetlistmember(self):
+        self.assertTrue(self.api.get_list_member(owner_screen_name='Twitter', slug='Official-Twitter-Accounts', screen_name='TwitterAPI'))
 
     @tape.use_cassette('testsubscribeunsubscribelist.json')
     def testsubscribeunsubscribelist(self):
@@ -339,24 +340,24 @@ class TweepyAPITests(TweepyTestCase):
         self.api.subscribe_list(**params)
         self.api.unsubscribe_list(**params)
 
-    @tape.use_cassette('testlistsubscribers.json')
-    def testlistsubscribers(self):
-        self.api.list_subscribers(owner_screen_name='Twitter', slug='Official-Twitter-Accounts')
+    @tape.use_cassette('testgetlistsubscribers.json')
+    def testgetlistsubscribers(self):
+        self.api.get_list_subscribers(owner_screen_name='Twitter', slug='Official-Twitter-Accounts')
 
-    @tape.use_cassette('testshowlistsubscriber.json')
-    def testshowlistsubscriber(self):
-        self.assertTrue(self.api.show_list_subscriber(owner_screen_name='Twitter', slug='Official-Twitter-Accounts', screen_name='TwitterMktg'))
+    @tape.use_cassette('testgetlistsubscriber.json')
+    def testgetlistsubscriber(self):
+        self.assertTrue(self.api.get_list_subscriber(owner_screen_name='Twitter', slug='Official-Twitter-Accounts', screen_name='TwitterMktg'))
 
     @tape.use_cassette('testsavedsearches.json')
     def testsavedsearches(self):
         s = self.api.create_saved_search('test')
-        self.api.saved_searches()
+        self.api.get_saved_searches()
         self.assertEqual(self.api.get_saved_search(s.id).query, 'test')
         self.api.destroy_saved_search(s.id)
 
-    @tape.use_cassette('testsearch.json')
-    def testsearch(self):
-        self.api.search('tweepy')
+    @tape.use_cassette('testsearchtweets.json')
+    def testsearchtweets(self):
+        self.api.search_tweets('tweepy')
 
     @tape.use_cassette('testgeoapis.json')
     def testgeoapis(self):

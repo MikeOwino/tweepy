@@ -15,11 +15,14 @@ Contents:
    getting_started.rst
    auth_tutorial.rst
    code_snippet.rst
-   cursor_tutorial.rst
    api.rst
+   client.rst
+   models.rst
    stream.rst
+   asyncstream.rst
    exceptions.rst
    extended_tweets.rst
+   pagination.rst
    streaming.rst
    running_tests.rst
    changelog.md

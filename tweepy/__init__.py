@@ -5,23 +5,26 @@
 """
 Tweepy Twitter API library
 """
-__version__ = '3.10.0'
+__version__ = '4.0.0-alpha'
 __author__ = 'Joshua Roesslein'
 __license__ = 'MIT'
 
 from tweepy.api import API
 from tweepy.auth import AppAuthHandler, OAuthHandler
 from tweepy.cache import Cache, FileCache, MemoryCache
+from tweepy.client import Client
 from tweepy.cursor import Cursor
 from tweepy.errors import (
     BadRequest, Forbidden, HTTPException, NotFound, TooManyRequests,
     TweepyException, TwitterServerError, Unauthorized
 )
-from tweepy.models import (
-    DirectMessage, Friendship, ModelFactory, SavedSearch, SearchResults,
-    Status, User
-)
+from tweepy.media import Media
+from tweepy.pagination import Paginator
+from tweepy.place import Place
+from tweepy.poll import Poll
 from tweepy.streaming import Stream
+from tweepy.tweet import ReferencedTweet, Tweet
+from tweepy.user import User
 
 # Global, unauthenticated instance of API
 api = API()
